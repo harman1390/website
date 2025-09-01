@@ -728,23 +728,29 @@ section p {
   .expertise-back {
     max-height: 0;
     overflow: hidden;
-    transition: max-height 0.5s ease-out, padding 0.3s ease-out;
+    transition: opacity 0.3s ease, max-height 0.5s ease-out, padding 0.3s ease-out;
     padding: 0;
+    margin: 0;
     opacity: 0;
-    visibility: hidden;
+    pointer-events: none;
   }
   
   .expertise-card.active .expertise-back {
     max-height: 1000px;
     padding: 1.5rem 0 0 0;
     opacity: 1;
+    pointer-events: auto;
     visibility: visible;
   }
   
-  .expertise-card .btn {
-    margin-top: 1rem;
-    width: 100%;
+  .expertise-back .btn {
+    margin: 1.5rem auto 0;
+    display: block;
+    width: 80%;
+    max-width: 200px;
     text-align: center;
+    opacity: 1 !important;
+    pointer-events: auto !important;
   }
   
   .learn-more {

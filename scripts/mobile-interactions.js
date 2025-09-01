@@ -11,9 +11,13 @@ document.addEventListener('DOMContentLoaded', function() {
       const learnMore = card.querySelector('.learn-more');
       const backContent = card.querySelector('.expertise-back');
       
-      // Set initial state
+      // Ensure back content is visible for mobile
       if (backContent) {
-        backContent.style.display = 'none';
+        backContent.style.display = 'block';
+        backContent.style.opacity = '0';
+        backContent.style.height = '0';
+        backContent.style.overflow = 'hidden';
+        backContent.style.transition = 'opacity 0.3s ease, height 0.3s ease';
       }
       
       learnMore?.addEventListener('click', function(e) {
@@ -26,7 +30,11 @@ document.addEventListener('DOMContentLoaded', function() {
           const icon = c.querySelector('.learn-more i');
           const back = c.querySelector('.expertise-back');
           if (icon) icon.style.transform = 'rotate(0)';
-          if (back) back.style.display = 'none';
+          if (back) {
+            back.style.opacity = '0';
+            back.style.height = '0';
+            back.style.pointerEvents = 'none';
+          }
         });
         
         // Toggle current card if it wasn't active
@@ -35,7 +43,11 @@ document.addEventListener('DOMContentLoaded', function() {
           const icon = learnMore.querySelector('i');
           const back = card.querySelector('.expertise-back');
           if (icon) icon.style.transform = 'rotate(90deg)';
-          if (back) back.style.display = 'block';
+          if (back) {
+            back.style.opacity = '1';
+            back.style.height = 'auto';
+            back.style.pointerEvents = 'auto';
+          }
         }
       });
     });
