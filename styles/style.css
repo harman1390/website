@@ -704,30 +704,45 @@ section p {
 @media (max-width: 1024px) {
   .expertise-card {
     height: auto;
-    min-height: 320px;
+    min-height: auto;
+    padding: 1.5rem;
+    cursor: default;
   }
   
   .expertise-card:hover {
+    transform: none;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
     height: auto;
-    min-height: 500px;
+    min-height: auto;
+  }
+  
+  .expertise-front,
+  .expertise-back {
+    position: relative;
+    opacity: 1 !important;
+    transform: none !important;
+    padding: 0;
+    pointer-events: auto;
   }
   
   .expertise-back {
-    position: relative;
-    opacity: 1;
-    transform: none;
-    padding: 2rem 0 0 0;
-    height: auto;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-out;
   }
   
-  .expertise-front {
-    opacity: 1 !important;
-    transform: none !important;
+  .expertise-card.active .expertise-back {
+    max-height: 1000px;
+    padding-top: 1.5rem;
   }
   
-  .expertise-card:hover .expertise-back {
-    opacity: 1;
-    transform: none;
+  .learn-more {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 1rem;
+    color: var(--ctr-primary);
+    cursor: pointer;
   }
 }
 
