@@ -6,39 +6,67 @@ document.addEventListener('DOMContentLoaded', function() {
   const isMobile = window.innerWidth <= 1024;
   
   if (isMobile) {
+    // Initialize all cards as inactive
     expertiseCards.forEach(card => {
       const learnMore = card.querySelector('.learn-more');
+      const backContent = card.querySelector('.expertise-back');
+      
+      // Set initial state
+      if (backContent) {
+        backContent.style.display = 'none';
+      }
       
       learnMore?.addEventListener('click', function(e) {
         e.stopPropagation();
-        card.classList.toggle('active');
+        const wasActive = card.classList.contains('active');
         
-        // Toggle the arrow icon
-        const icon = learnMore.querySelector('i');
-        if (icon) {
-          icon.style.transform = card.classList.contains('active') ? 'rotate(90deg)' : 'rotate(0)';
+        // Close all cards first
+        expertiseCards.forEach(c => {
+          c.classList.remove('active');
+          const icon = c.querySelector('.learn-more i');
+          const back = c.querySelector('.expertise-back');
+          if (icon) icon.style.transform = 'rotate(0)';
+          if (back) back.style.display = 'none';
+        });
+        
+        // Toggle current card if it wasn't active
+        if (!wasActive) {
+          card.classList.add('active');
+          const icon = learnMore.querySelector('i');
+          const back = card.querySelector('.expertise-back');
+          if (icon) icon.style.transform = 'rotate(90deg)';
+          if (back) back.style.display = 'block';
         }
       });
     });
     
-    // Close other cards when one is opened
+    // Close cards when clicking outside
     document.addEventListener('click', function(e) {
       if (!e.target.closest('.expertise-card')) {
         expertiseCards.forEach(card => {
           card.classList.remove('active');
           const icon = card.querySelector('.learn-more i');
+          const back = card.querySelector('.expertise-back');
           if (icon) icon.style.transform = 'rotate(0)';
-        });
-      } else if (e.target.closest('.expertise-card')) {
-        const clickedCard = e.target.closest('.expertise-card');
-        expertiseCards.forEach(card => {
-          if (card !== clickedCard) {
-            card.classList.remove('active');
-            const icon = card.querySelector('.learn-more i');
-            if (icon) icon.style.transform = 'rotate(0)';
-          }
+          if (back) back.style.display = 'none';
         });
       }
+    });
+    
+    // Handle window resize
+    let resizeTimer;
+    window.addEventListener('resize', function() {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(function() {
+        if (window.innerWidth > 1024) {
+          // Reset all cards on desktop view
+          expertiseCards.forEach(card => {
+            card.classList.remove('active');
+            const back = card.querySelector('.expertise-back');
+            if (back) back.style.display = '';
+          });
+        }
+      }, 250);
     });
   }
 });
