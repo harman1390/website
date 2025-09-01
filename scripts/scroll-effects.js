@@ -39,22 +39,49 @@ document.addEventListener('DOMContentLoaded', () => {
     const cards = document.querySelectorAll('.card, .portfolio-item, .testimonial');
     const animatedElements = [...sections, ...cards];
 
+    // Track scroll direction with better threshold
+    let lastScrollTop = 0;
+    let scrollDirection = 'down';
+    const SCROLL_THRESHOLD = 5; // Minimum pixels scrolled to detect direction
+
+    // Update scroll direction on scroll
+    function updateScrollDirection() {
+        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        
+        // Only update direction if scrolled more than threshold
+        if (Math.abs(scrollTop - lastScrollTop) > SCROLL_THRESHOLD) {
+            scrollDirection = scrollTop > lastScrollTop ? 'down' : 'up';
+            lastScrollTop = scrollTop <= 0 ? 0 : scrollTop;
+        }
+    }
+
     const fadeInOnScroll = new IntersectionObserver((entries, observer) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
-                if (entry.target.classList.contains('card')) {
-                    entry.target.classList.add('visible');
-                } else if (entry.target.tagName === 'SECTION') {
-                    entry.target.classList.add('visible');
-                    // Animate child elements with staggered delay
-                    const childElements = entry.target.querySelectorAll('.card, .portfolio-item, .testimonial');
-                    childElements.forEach((el, index) => {
-                        setTimeout(() => {
-                            el.classList.add('visible');
-                        }, index * 100); // Stagger the animation
-                    });
+                if (scrollDirection === 'down') {
+                    // Show elements when scrolling down and they enter viewport
+                    if (entry.target.classList.contains('card') || entry.target.classList.contains('portfolio-item') || entry.target.classList.contains('testimonial')) {
+                        entry.target.classList.add('visible');
+                    } else if (entry.target.tagName === 'SECTION') {
+                        entry.target.classList.add('visible');
+                        const childElements = entry.target.querySelectorAll('.card, .portfolio-item, .testimonial');
+                        childElements.forEach((el, index) => {
+                            setTimeout(() => {
+                                if (scrollDirection === 'down') { // Only if still scrolling down
+                                    el.classList.add('visible');
+                                }
+                            }, index * 100);
+                        });
+                    }
                 }
-                observer.unobserve(entry.target);
+            } else {
+                // When element leaves viewport or direction changes
+                if (entry.target.classList.contains('card') || entry.target.classList.contains('portfolio-item') || entry.target.classList.contains('testimonial')) {
+                    entry.target.classList.remove('visible');
+                } else if (entry.target.tagName === 'SECTION') {
+                    const childElements = entry.target.querySelectorAll('.card, .portfolio-item, .testimonial');
+                    childElements.forEach(el => el.classList.remove('visible'));
+                }
             }
         });
     }, observerOptions);
@@ -90,10 +117,29 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Throttle scroll event
     let isScrolling;
-    window.addEventListener('scroll', () => {
+    let lastScrollTime = 0;
+    const SCROLL_THROTTLE = 50; // ms
+    
+    function handleScrollEvent() {
+        const now = Date.now();
+        if (now - lastScrollTime < SCROLL_THROTTLE) return;
+        lastScrollTime = now;
+        
+        const previousDirection = scrollDirection;
+        updateScrollDirection();
+        
+        // Re-observe elements when direction changes
+        if (scrollDirection !== previousDirection) {
+            animatedElements.forEach(element => {
+                fadeInOnScroll.observe(element);
+            });
+        }
+        
         window.cancelAnimationFrame(isScrolling);
         isScrolling = window.requestAnimationFrame(handleScroll);
-    }, false);
+    }
+    
+    window.addEventListener('scroll', handleScrollEvent, { passive: true });
 
     // Add active class to nav links on scroll
     function highlightNav() {
